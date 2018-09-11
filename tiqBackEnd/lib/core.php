@@ -2,6 +2,9 @@
 include_once('client.php');
 include_once('mysql.php');
 include_once('ticket.php');
+include_once('email.php');
+include_once('user.php');
+include_once('emailReader.php');
 
 
 class core{
@@ -43,6 +46,10 @@ class core{
 			return "";
 		$tran = new $transforms();
 		return $tran->ticketToJson($tik);
+	}
+	function checkEmail(){
+		$reader = new Email_reader();
+		$reader->inbox();
 	}
 	
 }

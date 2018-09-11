@@ -10,11 +10,11 @@ class ticket{
 	var $Client;
 	var $Subject;
 	var $Sender;
-	function __construct() {
+	function __construct(){
 		$this->IdTicket=0;
 		$this->TicketDate = Date('Y-m-d');
 		$this->AttendedBy = new user();
-		$this->TicketState = new ticketstate();
+		$this->TicketState = 0;
 		$this->TicketNotes = "";
 		$this->Hidden="";
 		$this->Client = new client();
@@ -32,7 +32,7 @@ class ticket{
 			,hidden
 			,idClient
 			,subject
-			from ticket where idTicket=".$this->IdTicket."
+			from tqTicket where idTicket=".$this->IdTicket."
 			";
 		$res = $ac->query($sql);
 		if($ac->lines($res)==0)
@@ -54,10 +54,11 @@ class ticket{
 	}
 	function save(){
 		$ac = new tiqmysql();
-		return $this->save($ac);
+		return $this->saveTran($ac);
 	}
-	function save($pac){
+	function saveTran($pac){
 		$sql="";
+		echo "inicia saver ";
 		if($this->IdTicket==0){
 			$sql="insert into tqTicket (
 			ticketDate
@@ -71,19 +72,20 @@ class ticket{
 			) values (
 		    now()
 		    ,".$this->AttendedBy->idUser."
-		    ,".$this->TicketState->IdTicketState."
+		    ,".$this->TicketState."
 		    ,'". $pac->sanitize($this->TicketNotes)."'
 		    ,".$this->hidden."
 		    ,".$this->Client->idClient."
 		    ,'".$pac->sanitize($this->Subject)."'
 		    ,'".$pac->sanitize($this->Sender)."'
 			)";
+			echo $sql;
 		}
 		else
 		{
 			$sql="update tqTicket set 
 			    attendedBy=".$this->AttendedBy->IdUser."
-			    ,ticketstate=".$this->TicketState->IdTicketState."
+			    ,ticketstate=".$this->TicketState."
 			    ,ticketNotes='".$pac->sanitize($this->TicketNotes)."'
 			    ,hidden=".$this->Hidden."
 			    ,idClient=".$this->Client->idClient."
@@ -91,6 +93,7 @@ class ticket{
 			    ,sender='".$pac->sanitize($this->Sender->IdUser)."'
 			     where idTicket=".$this->IdTicket."
 			    ";
+			    echo $sql;
 		}
 		$pac->query($sql);
 		if($this->IdTicket==0){
